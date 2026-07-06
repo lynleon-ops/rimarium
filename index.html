@@ -53,7 +53,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   /* ── Temas — GitHub Primer (Light / Dark) ─── */
-  :root{ --radius:12px; }
+  :root{ --radius:6px; }
 
   html[data-theme="light"]{
     --bg:#eaeef2;              /* fondo alrededor de la caja (inset) */
@@ -100,17 +100,28 @@
   /* ── Caja principal (boxed 1100px) ─────────── */
   .wrap{
     max-width:1100px;margin:0 auto;position:relative;
-    background:var(--panel);border:1px solid var(--line);border-radius:18px;
-    padding:40px 44px 52px;
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    padding:20px;
     box-shadow:0 2px 6px rgba(0,0,0,.06), 0 22px 60px rgba(0,0,0,.14);
   }
 
   /* ── Theme toggle ───────────────────────── */
+  .top-controls{
+    position:absolute;top:18px;right:20px;z-index:20;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  #share-btn{
+    background:var(--btn);border:1px solid var(--btn);color:var(--btn-fg);
+    font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;
+    padding:6px 12px;border-radius:6px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;
+  }
+  #share-btn:hover{opacity:.88}
+  #share-btn svg{width:12px;height:12px;fill:currentColor;display:block}
   #theme-toggle{
-    position:absolute;top:20px;right:22px;
     background:var(--card);border:1px solid var(--line);color:var(--muted);
-    font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;
-    text-transform:uppercase;padding:9px 14px;border-radius:999px;cursor:pointer;
+    font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.14em;
+    text-transform:uppercase;padding:6px 11px;border-radius:6px;cursor:pointer;
     transition:color .15s,border-color .15s;
   }
   #theme-toggle:hover{color:var(--text);border-color:var(--muted)}
@@ -126,17 +137,55 @@
 
   /* ── Search ─────────────────────────────── */
   .search{display:flex;gap:10px;margin:32px auto 6px;max-width:600px}
+  .input-wrap{position:relative;flex:1;display:flex}
   #palabra-input{
     flex:1;background:var(--card);border:1px solid var(--line);color:var(--text);
     font-family:'Cormorant Garamond',serif;font-size:26px;padding:14px 22px;
-    border-radius:var(--radius);outline:none;transition:border-color .2s;
+    border-radius:6px;outline:none;transition:border-color .2s;
   }
   #palabra-input::placeholder{color:var(--muted);font-style:italic}
   #palabra-input:focus{border-color:var(--amber)}
+  /* autocompletado / typeahead */
+  .suggestions{
+    position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:40;
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden;
+    box-shadow:0 16px 44px rgba(0,0,0,.20), 0 2px 6px rgba(0,0,0,.08);
+    animation:sugIn .14s ease both;
+  }
+  .suggestions[hidden]{display:none}
+  @keyframes sugIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .sug-list{list-style:none;margin:0;padding:6px;max-height:316px;overflow-y:auto}
+  .sug-item{
+    display:flex;align-items:center;position:relative;cursor:pointer;
+    font-family:'DM Sans',sans-serif;font-weight:600;font-size:19px;color:var(--text);
+    padding:11px 15px;border-radius:6px;transition:background-color .12s,color .12s;
+  }
+  .sug-word{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sug-mark{color:var(--muted);font-weight:500}      /* lo ya escrito, atenuado */
+  .sug-enter{
+    margin-left:auto;padding-left:12px;font-family:'DM Mono',monospace;font-size:14px;
+    color:var(--amber);opacity:0;transition:opacity .12s;
+  }
+  .sug-item:hover{background:var(--card-hover)}
+  .sug-item.active{background:var(--card-hover);color:var(--amber);box-shadow:inset 3px 0 0 var(--amber)}
+  .sug-item.active .sug-enter{opacity:1}
+  .sug-foot{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:9px 16px;border-top:1px solid var(--line-soft);background:var(--card);
+    font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--muted);
+    text-transform:uppercase;
+  }
+  .sug-foot kbd{
+    font-family:'DM Mono',monospace;background:var(--panel);border:1px solid var(--line);
+    border-radius:6px;padding:1px 6px;margin:0 2px;color:var(--text);font-size:10px;line-height:1.6;
+  }
+  .sug-list::-webkit-scrollbar{width:11px}
+  .sug-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px;border:3px solid var(--panel)}
+  .sug-list::-webkit-scrollbar-track{background:transparent}
   #buscar-btn{
     background:var(--btn);color:var(--btn-fg);border:none;cursor:pointer;
     font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.14em;
-    text-transform:uppercase;padding:0 30px;border-radius:var(--radius);transition:opacity .15s;
+    text-transform:uppercase;padding:0 30px;border-radius:6px;transition:opacity .15s;
   }
   #buscar-btn:hover:not(:disabled){opacity:.88}
   #buscar-btn:disabled{opacity:.45;cursor:wait}
@@ -166,12 +215,12 @@
   /* ── Menú de pestañas ───────────────────── */
   .tabs{
     display:inline-flex;gap:4px;background:var(--tab-bg);border:1px solid var(--line);
-    border-radius:999px;padding:4px;margin-bottom:26px;flex-wrap:wrap;
+    border-radius:6px;padding:4px;margin-bottom:26px;flex-wrap:wrap;
   }
   .tab{
     background:transparent;border:none;cursor:pointer;color:var(--muted);
     font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    padding:9px 18px;border-radius:999px;transition:color .15s,background-color .15s;
+    padding:9px 18px;border-radius:6px;transition:color .15s,background-color .15s;
     display:inline-flex;align-items:center;gap:8px;
   }
   .tab:hover{color:var(--text)}
@@ -183,58 +232,78 @@
   .tab.active .tab-count{opacity:.85}
 
   .grid{
-    display:grid;gap:10px;
-    grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
+    display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;
   }
   .card{
-    position:relative;overflow:hidden;background:var(--card);
-    border:1px solid var(--line);border-radius:5px;
-    padding:15px 16px 17px;cursor:pointer;
+    position:relative;background:var(--card);
+    border:1px solid var(--line);border-radius:6px;
+    padding:15px 16px 20px;cursor:pointer;
+    display:flex;align-items:baseline;gap:9px;flex:0 0 auto;min-width:64px;max-width:100%;
     transition:background-color .15s,border-color .15s,transform .15s;
     animation:fade .3s ease both;
   }
   .card:hover{background:var(--card-hover);border-color:var(--muted);transform:translateY(-1px)}
   @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
   .card .word{
-    font-family:'DM Sans',sans-serif;font-weight:700;font-size:18px;
-    color:var(--text);letter-spacing:-.01em;display:block;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    font-family:'DM Sans',sans-serif;font-weight:700;font-size:18px;line-height:1.15;
+    color:var(--text);letter-spacing:-.01em;white-space:nowrap;
   }
   .card .pct{
-    position:absolute;top:11px;right:13px;
-    font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);
+    font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);flex:0 0 auto;
   }
-  .card .accent{position:absolute;left:16px;bottom:9px;height:3px;width:30px;border-radius:2px}
+  .card .accent{position:absolute;left:16px;bottom:9px;height:3px;width:30px;border-radius:6px}
   .section.cons .accent{background:var(--amber)}
   .section.aso  .accent{background:var(--teal)}
   .section.apx  .accent{background:var(--apx)}
 
+  /* ── Selector de vista: lista / cuadrícula / mosaico ── */
+  .results-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:26px}
+  .results-controls .tabs{margin-bottom:0}
+  .view-switch{display:inline-flex;gap:2px;background:var(--tab-bg);border:1px solid var(--line);border-radius:6px;padding:3px}
+  .view-btn{
+    background:transparent;border:none;cursor:pointer;color:var(--muted);
+    width:36px;height:30px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;
+    transition:color .15s,background-color .15s;
+  }
+  .view-btn svg{width:15px;height:15px;fill:currentColor;display:block}
+  .view-btn:hover{color:var(--text)}
+  .view-btn.active{background:var(--panel);color:var(--amber);box-shadow:0 1px 2px rgba(0,0,0,.10)}
+
+  /* Vista MOSAICO = base de .grid (flex-wrap, tarjetas al tamaño de su palabra) */
+  /* Vista CUADRÍCULA: columnas iguales */
+  #results-area[data-view="grid"] .grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  }
+  #results-area[data-view="grid"] .card .word{white-space:normal;overflow-wrap:break-word;word-break:break-word}
+  /* Vista LISTA: una por fila, a todo el ancho */
+  #results-area[data-view="list"] .grid{flex-direction:column;gap:6px}
+  #results-area[data-view="list"] .card{width:100%}
+  #results-area[data-view="list"] .card .pct{margin-left:auto}
+
   .no-results{color:var(--muted);font-style:italic;font-size:18px;padding:4px 2px}
 
   footer{
-    margin-top:48px;padding-top:18px;border-top:1px solid var(--line);
+    margin-top:22px;padding-top:10px;border-top:1px solid var(--line);
     display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
     font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);
   }
   footer .fl{letter-spacing:.03em}
-  footer .fr{display:inline-flex;align-items:center;gap:16px}
+  footer .fr{display:inline-flex;align-items:center}
   footer .fr .logo{
-    letter-spacing:.28em;text-transform:uppercase;font-weight:500;
-    color:var(--text);opacity:.8;
+    display:inline-flex;flex-direction:column;align-items:center;line-height:1;text-align:center;
   }
-  footer .fr .logo .sep{color:var(--amber);margin:0 7px}
-  #share-btn{
-    background:var(--card);border:1px solid var(--line);color:var(--text);
-    font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-    padding:8px 14px;border-radius:999px;cursor:pointer;
-    display:inline-flex;align-items:center;gap:7px;transition:border-color .15s,color .15s;
+  footer .fr .logo .l1{
+    font-family:'Cormorant Garamond',serif;font-weight:600;font-size:14px;
+    letter-spacing:.22em;text-transform:uppercase;color:#a98b5c;padding-left:.22em;
   }
-  #share-btn:hover{border-color:var(--muted);color:var(--amber)}
-  #share-btn svg{width:13px;height:13px;fill:currentColor;display:block}
+  footer .fr .logo .l2{
+    font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.4em;
+    text-transform:uppercase;color:#5b9b93;margin-top:1px;padding-left:.4em;
+  }
   #toast{
     position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
     background:var(--text);color:var(--panel);font-family:'DM Mono',monospace;font-size:12px;
-    letter-spacing:.04em;padding:11px 20px;border-radius:8px;
+    letter-spacing:.04em;padding:11px 20px;border-radius:6px;
     opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60;
     box-shadow:0 8px 30px rgba(0,0,0,.25);
   }
@@ -242,12 +311,11 @@
 
   @media(max-width:720px){
     body{padding:24px 12px 40px}
-    .wrap{padding:30px 18px 38px;border-radius:14px}
+    .wrap{padding:20px;border-radius:6px}
     header{padding-top:14px}
     .lede{font-size:18px}
     #results-title{font-size:26px}
-    .grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
-    #theme-toggle{top:14px;right:14px}
+    .top-controls{top:14px;right:14px}
     .tabs{display:flex;width:100%}
     .tab{flex:1;justify-content:center;padding:10px 8px}
     footer{flex-direction:column;align-items:flex-start;gap:8px}
@@ -256,8 +324,8 @@
     .search{flex-direction:column;gap:8px}
     #buscar-btn{padding:14px 30px;width:100%}
     #palabra-input{font-size:22px;padding:13px 18px}
-    .grid{grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px}
-    .card{padding:13px 13px 16px}
+    .grid{gap:8px}
+    .card{padding:13px 13px 17px}
     .card .word{font-size:16px}
     h1{font-size:40px}
     .eyebrow{letter-spacing:.30em}
@@ -269,7 +337,13 @@
 <body>
 <div class="wrap">
 
-  <button id="theme-toggle" type="button">Modo oscuro</button>
+  <div class="top-controls">
+    <button id="share-btn" type="button" aria-label="Compartir Rimarium">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-3.62 2.19a2.5 2.5 0 0 1 0 1.364l3.62 2.19a2.5 2.5 0 1 1-.717 1.186l-3.62-2.19a2.5 2.5 0 1 1 0-3.736l3.62-2.19A2.5 2.5 0 0 1 11 2.5Z"/></svg>
+      Compartir
+    </button>
+    <button id="theme-toggle" type="button">Oscuro</button>
+  </div>
 
   <header>
     <div class="eyebrow">Buscador de rimas en idioma Español</div>
@@ -278,7 +352,16 @@
   </header>
 
   <div class="search">
-    <input id="palabra-input" type="text" placeholder="Escribe una palabra…" autocomplete="off" spellcheck="false">
+    <div class="input-wrap">
+      <input id="palabra-input" type="text" placeholder="Escribe una palabra…" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="suggestions">
+      <div id="suggestions" class="suggestions" hidden>
+        <ul id="sug-list" class="sug-list" role="listbox"></ul>
+        <div class="sug-foot">
+          <span><kbd>↑</kbd><kbd>↓</kbd> Navegar</span>
+          <span><kbd>↵</kbd> Elegir · <kbd>Esc</kbd> Cerrar</span>
+        </div>
+      </div>
+    </div>
     <button id="buscar-btn">Buscar</button>
   </div>
   <div id="status">Cargando diccionario…</div>
@@ -289,10 +372,23 @@
       <div id="results-pattern"></div>
     </div>
 
-    <div class="tabs" role="tablist">
-      <button class="tab active" data-target="cons">Consonantes <span class="tab-count" id="n-cons">0</span></button>
-      <button class="tab" data-target="aso">Asonantes <span class="tab-count" id="n-aso">0</span></button>
-      <button class="tab" data-target="apx">Aproximadas <span class="tab-count" id="n-apx">0</span></button>
+    <div class="results-controls">
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-target="cons">Consonantes <span class="tab-count" id="n-cons">0</span></button>
+        <button class="tab" data-target="aso">Asonantes <span class="tab-count" id="n-aso">0</span></button>
+        <button class="tab" data-target="apx">Aproximadas <span class="tab-count" id="n-apx">0</span></button>
+      </div>
+      <div class="view-switch" role="group" aria-label="Vista de resultados">
+        <button class="view-btn" type="button" data-view="list" title="Lista" aria-label="Vista de lista">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="2.5" width="14" height="2.2" rx="1"/><rect x="1" y="6.9" width="14" height="2.2" rx="1"/><rect x="1" y="11.3" width="14" height="2.2" rx="1"/></svg>
+        </button>
+        <button class="view-btn" type="button" data-view="grid" title="Cuadrícula" aria-label="Vista de cuadrícula">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1"/><rect x="9" y="9" width="5.5" height="5.5" rx="1"/></svg>
+        </button>
+        <button class="view-btn active" type="button" data-view="masonry" title="Mosaico" aria-label="Vista de mosaico">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="5.5" height="8" rx="1"/><rect x="1.5" y="11" width="5.5" height="3.5" rx="1"/><rect x="9" y="1.5" width="5.5" height="3.5" rx="1"/><rect x="9" y="6" width="5.5" height="8.5" rx="1"/></svg>
+        </button>
+      </div>
     </div>
 
     <section class="section cons" data-panel="cons">
@@ -307,13 +403,9 @@
   </div>
 
   <footer>
-    <span class="fl">© 2026 Rimarium v1.8 · Todos los derechos reservados.</span>
+    <span class="fl">Copyright © 2026 Rimarium V3.1</span>
     <span class="fr">
-      <button id="share-btn" type="button" aria-label="Compartir Rimarium">
-        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-3.62 2.19a2.5 2.5 0 0 1 0 1.364l3.62 2.19a2.5 2.5 0 1 1-.717 1.186l-3.62-2.19a2.5 2.5 0 1 1 0-3.736l3.62-2.19A2.5 2.5 0 0 1 11 2.5Z"/></svg>
-        Compartir
-      </button>
-      <span class="logo">Rimarium<span class="sep">/</span>Español</span>
+      <span class="logo"><span class="l1">Académica</span><span class="l2">Precisión</span></span>
     </span>
   </footer>
 
@@ -439,8 +531,7 @@ function cargarDiccionario(){
     diccionario = PALABRAS;
     for(let i=0;i<FREQ_N;i++) rango.set(PALABRAS[i], i);  // rango real de frecuencia
     cargado = true;
-    const n = diccionario.length.toLocaleString('es');
-    setStatus(`Diccionario cargado — ${n} palabras`, 'ready');
+    setStatus('', 'ready');
     btn.disabled = false;
     input.focus();
   }catch(e){
@@ -554,14 +645,89 @@ btn.addEventListener('click', ()=>{
     setStatus(`Resultados para "${val}"`, 'ready');
   }, 60);
 });
-input.addEventListener('keydown', e => { if(e.key==='Enter') btn.click(); });
+// ─── Autocompletado / typeahead ─────────────────────────────────────────────
+const sugg = document.getElementById('suggestions');
+const sugList = document.getElementById('sug-list');
+let sugItems = [];      // palabras sugeridas actuales
+let sugActivo = -1;     // índice resaltado
+let sugTimer = null;
+
+function calcularSugerencias(q){
+  const nq = stripAcc(q.toLowerCase().trim());
+  const out = [];
+  if(nq.length < 2) return out;
+  // el diccionario ya está ordenado por frecuencia, así que las primeras
+  // coincidencias por prefijo son las palabras más comunes
+  for(let i=0; i<diccionario.length && out.length < 8; i++){
+    const w = diccionario[i];
+    if(stripAcc(w).startsWith(nq) && stripAcc(w) !== nq) out.push(w);
+  }
+  return out;
+}
+function renderSugerencias(items, plen){
+  sugItems = items;
+  sugActivo = -1;
+  if(!items.length){ ocultarSug(); return; }
+  // stripAcc conserva la longitud, así que los primeros `plen` caracteres
+  // de la palabra corresponden a lo ya escrito
+  sugList.innerHTML = items.map((w,i) => {
+    const pre = escapeHtml(w.slice(0, plen));
+    const rest = escapeHtml(w.slice(plen));
+    return `<li class="sug-item" role="option" data-i="${i}">`
+         + `<span class="sug-word"><span class="sug-mark">${pre}</span>${rest}</span>`
+         + `<span class="sug-enter">↵</span></li>`;
+  }).join('');
+  sugg.hidden = false;
+  input.setAttribute('aria-expanded','true');
+}
+function ocultarSug(){
+  sugg.hidden = true; sugList.innerHTML = ''; sugItems = []; sugActivo = -1;
+  input.setAttribute('aria-expanded','false');
+}
+function marcarActivo(){
+  Array.prototype.forEach.call(sugList.children, (li,i) => {
+    const on = (i === sugActivo);
+    li.classList.toggle('active', on);
+    if(on) li.scrollIntoView({block:'nearest'});
+  });
+}
+function elegirSugerencia(i){
+  if(i<0 || i>=sugItems.length) return;
+  input.value = sugItems[i];
+  ocultarSug();
+  btn.click();
+}
+
+input.addEventListener('input', ()=>{
+  clearTimeout(sugTimer);
+  sugTimer = setTimeout(()=>{
+    if(!cargado){ ocultarSug(); return; }
+    const nq = stripAcc(input.value.toLowerCase().trim());
+    renderSugerencias(calcularSugerencias(input.value), nq.length);
+  }, 110);
+});
+input.addEventListener('keydown', e=>{
+  if(!sugg.hidden && sugItems.length){
+    if(e.key === 'ArrowDown'){ e.preventDefault(); sugActivo = (sugActivo+1) % sugItems.length; marcarActivo(); return; }
+    if(e.key === 'ArrowUp'){ e.preventDefault(); sugActivo = (sugActivo-1+sugItems.length) % sugItems.length; marcarActivo(); return; }
+    if(e.key === 'Enter' && sugActivo >= 0){ e.preventDefault(); elegirSugerencia(sugActivo); return; }
+    if(e.key === 'Escape'){ ocultarSug(); return; }
+  }
+  if(e.key === 'Enter'){ ocultarSug(); btn.click(); }
+});
+// mousedown (no click) + preventDefault para que el blur no cierre antes de elegir
+sugList.addEventListener('mousedown', e=>{
+  const li = e.target.closest('.sug-item');
+  if(li){ e.preventDefault(); elegirSugerencia(parseInt(li.getAttribute('data-i'),10)); }
+});
+input.addEventListener('blur', ()=> setTimeout(ocultarSug, 150));
 
 // ─── Tema (claro por defecto) ───────────────────────────────────────────────
 const toggle = document.getElementById('theme-toggle');
 const root = document.documentElement;
 function aplicarTema(t){
   root.setAttribute('data-theme', t);
-  toggle.textContent = (t === 'light') ? 'Modo oscuro' : 'Modo claro';
+  toggle.textContent = (t === 'light') ? 'Oscuro' : 'Claro';
   try{ localStorage.setItem('rimarium-tema', t); }catch(e){}
 }
 let temaInicial = 'light';
@@ -579,6 +745,18 @@ function activarTab(t){
   panels.forEach(p => p.hidden = (p.getAttribute('data-panel') !== t));
 }
 tabs.forEach(b => b.addEventListener('click', () => activarTab(b.getAttribute('data-target'))));
+
+// ─── Selector de vista (lista / cuadrícula / mosaico) ───────────────────────
+const viewBtns = Array.prototype.slice.call(document.querySelectorAll('.view-btn'));
+function aplicarVista(v){
+  area.setAttribute('data-view', v);
+  viewBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-view') === v));
+  try{ localStorage.setItem('rimarium-vista', v); }catch(e){}
+}
+viewBtns.forEach(b => b.addEventListener('click', () => aplicarVista(b.getAttribute('data-view'))));
+let vistaInicial = 'masonry';
+try{ const gv = localStorage.getItem('rimarium-vista'); if(gv) vistaInicial = gv; }catch(e){}
+aplicarVista(vistaInicial);
 
 // ─── Compartir (Web Share API + copia de enlace como respaldo) ──────────────
 const shareBtn = document.getElementById('share-btn');

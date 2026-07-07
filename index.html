@@ -290,6 +290,20 @@
   .view-btn:hover{color:var(--text)}
   .view-btn.active{background:var(--panel);color:var(--amber);box-shadow:0 1px 2px rgba(0,0,0,.10)}
 
+  /* Filtro por número de sílabas */
+  .syl-filter{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:-8px 0 24px}
+  .syl-label{
+    font-family:'DM Mono','SFMono-Regular',Consolas,monospace;font-size:10px;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-right:4px;
+  }
+  .syl-btn{
+    background:var(--tab-bg);border:1px solid var(--line);color:var(--muted);cursor:pointer;
+    font-family:'DM Mono','SFMono-Regular',Consolas,monospace;font-size:11px;letter-spacing:.06em;
+    padding:5px 12px;border-radius:6px;transition:color .15s,background-color .15s,border-color .15s;
+  }
+  .syl-btn:hover{color:var(--text)}
+  .syl-btn.active{background:var(--amber);color:var(--btn-fg);border-color:var(--amber)}
+
   /* Vista MOSAICO = base de .grid (flex-wrap, tarjetas al tamaño de su palabra) */
   /* Vista CUADRÍCULA: columnas iguales */
   #results-area[data-view="grid"] .grid{
@@ -413,6 +427,16 @@
       </div>
     </div>
 
+    <div class="syl-filter" role="group" aria-label="Filtrar por número de sílabas">
+      <span class="syl-label">Sílabas</span>
+      <button class="syl-btn active" type="button" data-syl="0">Todas</button>
+      <button class="syl-btn" type="button" data-syl="1">1</button>
+      <button class="syl-btn" type="button" data-syl="2">2</button>
+      <button class="syl-btn" type="button" data-syl="3">3</button>
+      <button class="syl-btn" type="button" data-syl="4">4</button>
+      <button class="syl-btn" type="button" data-syl="5">5+</button>
+    </div>
+
     <section class="section cons" data-panel="cons" role="tabpanel" id="panel-cons" aria-labelledby="tab-cons" tabindex="0">
       <div class="grid" id="consonantes-grid"></div>
     </section>
@@ -429,7 +453,7 @@
 
   <footer>
     <span class="fl">
-      <span class="copyline"><span class="cw">Copyright </span>© 2026 Rimarium V4.5</span>
+      <span class="copyline"><span class="cw">Copyright </span>© 2026 Rimarium V4.7</span>
       <button class="cred-link" id="cred-link" type="button" aria-controls="cred-panel" aria-expanded="false">Fuentes y Créditos</button>
     </span>
     <span class="fr">
@@ -440,7 +464,7 @@
   <div class="cred-panel" id="cred-panel" hidden>
     <p>Rimarium se construye sobre datos abiertos. Nuestro agradecimiento a sus autores:</p>
     <p><b>Rimas y diccionario:</b> «Lemario general del español» de Ismael Olea (<a href="https://github.com/olea/lemarios">olea/lemarios</a>); lista de frecuencia de <a href="https://github.com/hermitdave/FrequencyWords">hermitdave/FrequencyWords</a> (datos de OpenSubtitles); y <a href="https://github.com/words/an-array-of-spanish-words">words/an-array-of-spanish-words</a>.</p>
-    <p><b>Sinónimos:</b> tesauro español de OpenOffice/LibreOffice en formato MyThes (proyecto OpenThesaurus / RLA-ES), distribuido bajo licencia LGPL.</p>
+    <p><b>Sinónimos:</b> tesauro español de OpenOffice/LibreOffice en formato MyThes (proyecto OpenThesaurus / RLA-ES), distribuido bajo licencia LGPL. Lematización de formas verbales y plurales a partir de <a href="https://github.com/doozan/spanish_data">doozan/spanish_data</a> (derivado de Wiktionary, CC BY-SA).</p>
     <p>Cada recurso pertenece a sus respectivos autores y se usa conforme a sus licencias. Rimarium no está afiliado a estos proyectos.</p>
   </div>
 
@@ -59112,6 +59136,8 @@ tick	tic
 // ─── Estado ────────────────────────────────────────────────────────────────
 let diccionario = [];
 let dicNorm = [];        // versión sin tildes, precalculada (para autocompletado rápido)
+let filtroSilabas = 0;   // 0 = todas; 1..4 = nº exacto; 5 = 5 o más
+let ultimaBusqueda = ''; // última palabra buscada (para re-filtrar)
 let rango = new Map();   // palabra → rango de frecuencia (menor = más común)
 let cargado = false;
 
@@ -59142,6 +59168,39 @@ const ACENTOS = {'á':'a','é':'e','í':'i','ó':'o','ú':'u','ü':'u'};
 function stripAcc(s){ return s.replace(/[áéíóúü]/g, c => ACENTOS[c]); }
 function esVocal(c){ return 'aeiouáéíóúü'.includes(c); }
 function esFuerte(c){ return 'aeoáéó'.includes(c); }
+function esDebilAcentuada(c){ return 'íú'.includes(c); }
+
+// ¿dos vocales adyacentes forman una misma sílaba (diptongo)?
+function mismoNucleo(a, b){
+  if(esFuerte(a) && esFuerte(b)) return false;           // dos fuertes = hiato
+  if(esDebilAcentuada(a) || esDebilAcentuada(b)) return false; // débil acentuada = hiato
+  return true;                                            // diptongo
+}
+
+// Cuenta las sílabas de una palabra (diptongos, hiatos, h transparente)
+function contarSilabas(w){
+  w = w.toLowerCase();
+  const vs = [];
+  for(let i=0;i<w.length;i++) if(esVocal(w[i])) vs.push(i);
+  if(!vs.length) return 1;
+  let n = 0, i = 0;
+  while(i < vs.length){
+    let j = i;
+    while(j+1 < vs.length){
+      const gap = vs[j+1]-vs[j];
+      const adyacente = (gap===1) || (gap===2 && w[vs[j]+1]==='h');
+      if(adyacente && mismoNucleo(w[vs[j]], w[vs[j+1]])) j++;
+      else break;
+    }
+    n++; i = j+1;
+  }
+  return n;
+}
+function pasaSilabas(w){
+  if(filtroSilabas === 0) return true;
+  const s = contarSilabas(w);
+  return filtroSilabas >= 5 ? s >= 5 : s === filtroSilabas;
+}
 
 // Índice de la vocal tónica en la palabra original
 function tonicIndex(word){
@@ -59250,7 +59309,7 @@ function cargarDiccionario(){
   try{
     if(!Array.isArray(PALABRAS) || PALABRAS.length === 0) throw new Error('diccionario vacío');
     diccionario = PALABRAS;
-    dicNorm = PALABRAS.map(stripAcc);
+    dicNorm = PALABRAS.map(w => stripAcc(w).replace(/ñ/g,'n'));
     for(let i=0;i<FREQ_N;i++) rango.set(PALABRAS[i], i);  // rango real de frecuencia
     cargarSinonimos();
     cargado = true;
@@ -59291,8 +59350,9 @@ function setStatus(msg, cls){
 }
 
 // ─── Búsqueda ──────────────────────────────────────────────────────────────
-function buscar(palabra){
+function buscar(palabra, preservarTab){
   const q = palabra.toLowerCase().trim();
+  ultimaBusqueda = q;
   const qCons = sufCons(q);
   const qClave = claveCons(q);
   const qAso  = sufAso(q);
@@ -59306,8 +59366,8 @@ function buscar(palabra){
   // 1ª pasada: consonantes (por sonido) y asonantes exactas (recoge TODAS)
   for(const w of diccionario){
     if(w === q) continue;
-    if(claveCons(w) === qClave){ consonantes.push(w); yaConsonante.add(w); continue; }
-    if(sufAso(w) === qAso) asonantes.push(w);
+    if(claveCons(w) === qClave){ yaConsonante.add(w); if(pasaSilabas(w)) consonantes.push(w); continue; }
+    if(sufAso(w) === qAso && pasaSilabas(w)) asonantes.push(w);
   }
   const totalCons = consonantes.length, totalAso = asonantes.length;
 
@@ -59325,7 +59385,7 @@ function buscar(palabra){
     if(Math.abs(wf.length - qFon.length) > 3) continue;
     const maxL = Math.max(wf.length, qFon.length) || 1;
     const sim = 1 - lev(qFon, wf) / maxL;
-    if(sim >= 0.55 && sim < 1) scored.push([w, sim]);
+    if(sim >= 0.55 && sim < 1 && pasaSilabas(w)) scored.push([w, sim]);
   }
   // ordena por similitud y, a igualdad, por frecuencia de uso
   scored.sort((a,b) => (b[1]-a[1]) || ordenFrec(a[0], b[0]));
@@ -59349,9 +59409,11 @@ function buscar(palabra){
   renderCards(synGrid, sinonimos);
 
   // Abre la primera pestaña con resultados (útil en esdrújulas, casi sin consonantes)
-  const primera = consonantes.length ? 'cons' : asonantes.length ? 'aso'
-                : aproximadas.length ? 'apx' : sinonimos.length ? 'syn' : 'cons';
-  activarTab(primera);
+  if(!preservarTab){
+    const primera = consonantes.length ? 'cons' : asonantes.length ? 'aso'
+                  : aproximadas.length ? 'apx' : sinonimos.length ? 'syn' : 'cons';
+    activarTab(primera);
+  }
   area.style.display = 'block';
 }
 
@@ -59406,7 +59468,7 @@ let sugActivo = -1;     // índice resaltado
 let sugTimer = null;
 
 function calcularSugerencias(q){
-  const nq = stripAcc(q.toLowerCase().trim());
+  const nq = stripAcc(q.toLowerCase().trim()).replace(/ñ/g,'n');
   if(nq.length < 2) return [];
   const exactas = [], resto = [];
   const c0 = nq[0];
@@ -59531,6 +59593,14 @@ viewBtns.forEach(b => b.addEventListener('click', () => aplicarVista(b.getAttrib
 let vistaInicial = 'masonry';
 try{ const gv = localStorage.getItem('rimarium-vista'); if(gv) vistaInicial = gv; }catch(e){}
 aplicarVista(vistaInicial);
+
+// ─── Filtro por número de sílabas ───────────────────────────────────────────
+const sylBtns = Array.prototype.slice.call(document.querySelectorAll('.syl-btn'));
+sylBtns.forEach(b => b.addEventListener('click', ()=>{
+  filtroSilabas = parseInt(b.getAttribute('data-syl'), 10) || 0;
+  sylBtns.forEach(x => x.classList.toggle('active', x === b));
+  if(ultimaBusqueda) buscar(ultimaBusqueda, true);   // re-filtra manteniendo la pestaña
+}));
 
 // ─── Compartir (Web Share API + copia de enlace como respaldo) ──────────────
 const shareBtn = document.getElementById('share-btn');

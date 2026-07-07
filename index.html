@@ -109,8 +109,8 @@
 
   /* ── Theme toggle ───────────────────────── */
   .top-controls{
-    position:absolute;top:18px;right:20px;z-index:20;
-    display:inline-flex;align-items:center;gap:8px;
+    position:absolute;top:18px;left:20px;right:20px;z-index:20;
+    display:flex;align-items:center;justify-content:space-between;
   }
   #share-btn{
     background:var(--btn);border:1px solid var(--btn);color:var(--btn-fg);
@@ -183,8 +183,10 @@
   #buscar-btn{
     background:var(--btn);color:var(--btn-fg);border:none;cursor:pointer;
     font-family:'DM Mono','SFMono-Regular',Consolas,monospace;font-size:13px;letter-spacing:.14em;
-    text-transform:uppercase;padding:0 30px;border-radius:6px;transition:opacity .15s;
+    text-transform:uppercase;padding:0 26px;border-radius:6px;transition:opacity .15s;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
   }
+  #buscar-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex:0 0 auto}
   #buscar-btn:hover:not(:disabled){opacity:.88}
   #buscar-btn:disabled{opacity:.45;cursor:wait}
 
@@ -259,7 +261,7 @@
   /* Créditos / fuentes */
   .cred-link{
     background:none;border:none;cursor:pointer;padding:0;text-align:left;
-    font-family:'DM Mono','SFMono-Regular',Consolas,monospace;font-size:8px;letter-spacing:.06em;text-transform:uppercase;
+    font-family:'DM Mono','SFMono-Regular',Consolas,monospace;font-size:7px;letter-spacing:.05em;text-transform:uppercase;
     color:var(--muted);transition:color .15s;
     text-decoration:underline;text-underline-offset:2px;
   }
@@ -334,7 +336,7 @@
     header{padding-top:14px}
     .lede{font-size:18px}
     #results-title{font-size:26px}
-    .top-controls{top:14px;right:14px}
+    .top-controls{top:14px;left:14px;right:14px}
     .tabs{display:flex;width:100%}
     .tab{flex:1;justify-content:center;padding:10px 8px}
     footer{flex-direction:column;align-items:flex-start;justify-content:flex-start;flex-wrap:nowrap;gap:10px}
@@ -381,7 +383,7 @@
         </div>
       </div>
     </div>
-    <button id="buscar-btn">Buscar</button>
+    <button id="buscar-btn"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14.5" y2="14.5" stroke-linecap="round"/></svg>Buscar</button>
   </div>
   <div id="status">Cargando diccionario…</div>
 
@@ -427,7 +429,7 @@
 
   <footer>
     <span class="fl">
-      <span class="copyline"><span class="cw">Copyright </span>© 2026 Rimarium V4.3</span>
+      <span class="copyline"><span class="cw">Copyright </span>© 2026 Rimarium V4.5</span>
       <button class="cred-link" id="cred-link" type="button" aria-controls="cred-panel" aria-expanded="false">Fuentes y Créditos</button>
     </span>
     <span class="fr">

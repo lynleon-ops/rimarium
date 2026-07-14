@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rimarium — Buscador de rimas en idioma Español</title>
-<meta name="description" content="Rimarium — Buscador de rimas en idioma Español: consonantes, asonantes y aproximadas para poetas y compositores musicales.">
+<meta name="description" content="Rimarium — Buscador de rimas en idioma Español: consonantes, asonantes, de familia y aproximadas para poetas y compositores musicales.">
 <meta name="keywords" content="rimas, buscador de rimas, rima consonante, rima asonante, español, poesía, letras de canciones, compositores">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://lynleon-ops.github.io/rimarium/">
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rimarium">
 <meta property="og:title" content="Rimarium — Buscador de rimas en idioma Español">
-<meta property="og:description" content="Rimas consonantes, asonantes y aproximadas para poetas y compositores musicales. 122.132 palabras.">
+<meta property="og:description" content="Rimas consonantes, asonantes, de familia y aproximadas para poetas y compositores musicales. 122.132 palabras.">
 <meta property="og:url" content="https://lynleon-ops.github.io/rimarium/">
 <meta property="og:image" content="https://lynleon-ops.github.io/rimarium/og-rimarium.png">
 <meta property="og:image:width" content="1200">
@@ -31,7 +31,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Rimarium — Buscador de rimas en idioma Español">
-<meta name="twitter:description" content="Rimas consonantes, asonantes y aproximadas para poetas y compositores musicales.">
+<meta name="twitter:description" content="Rimas consonantes, asonantes, de familia y aproximadas para poetas y compositores musicales.">
 <meta name="twitter:image" content="https://lynleon-ops.github.io/rimarium/og-rimarium.png">
 
 <!-- Schema.org -->
@@ -41,7 +41,7 @@
   "@type": "WebApplication",
   "name": "Rimarium",
   "url": "https://lynleon-ops.github.io/rimarium/",
-  "description": "Buscador de rimas consonantes, asonantes y aproximadas en español para poetas y compositores musicales.",
+  "description": "Buscador de rimas consonantes, asonantes, de familia y aproximadas en español para poetas y compositores musicales.",
   "applicationCategory": "UtilityApplication",
   "operatingSystem": "Any",
   "inLanguage": "es",
@@ -68,6 +68,7 @@
     --amber:#0969da;           /* Consonantes = accent azul */
     --teal:#1a7f37;            /* Asonantes   = success verde */
     --apx:#8250df;             /* Aproximadas = done morado */
+    --fam:#bc4c00;             /* Familia = severe naranja quemado */
     --syn:#9a6700;             /* Sinónimos = attention dorado */
     --btn:#1f883d; --btn-fg:#ffffff;    /* botón primario verde GitHub */
     --tab-bg:#eff2f5; --tab-fg:#ffffff;
@@ -85,6 +86,7 @@
     --amber:#58a6ff;           /* Consonantes = azul */
     --teal:#3fb950;            /* Asonantes   = verde */
     --apx:#a371f7;             /* Aproximadas = morado */
+    --fam:#ec8e2c;             /* Familia = severe naranja */
     --syn:#d29922;             /* Sinónimos = attention dorado */
     --btn:#238636; --btn-fg:#ffffff;
     --tab-bg:#161b22; --tab-fg:#ffffff;
@@ -228,9 +230,23 @@
   .tab.active{color:var(--tab-fg)}
   .tab[data-target="cons"].active{background:var(--amber)}
   .tab[data-target="aso"].active{background:var(--teal)}
+  .tab[data-target="fam"].active{background:var(--fam)}
   .tab[data-target="apx"].active{background:var(--apx)}
   .tab[data-target="syn"].active{background:var(--syn)}
   .tab.active .tab-count{opacity:.85}
+  /* Encabezados de grupo dentro de la pestaña Familia */
+  .fam-group-head{
+    display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+    margin:16px 0 8px; padding-bottom:6px;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .fam-group-head:first-child{margin-top:2px}
+  .fam-group-name{
+    font-family:'DM Mono',monospace; font-size:12px; font-weight:500;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--fam);
+  }
+  .fam-group-desc{font-size:11px; color:var(--muted); font-style:italic}
+  .fam-subgrid{margin-bottom:4px}
 
   .grid{
     display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;
@@ -365,7 +381,7 @@
     .card{padding:13px 13px 17px}
     .card .word{font-size:16px}
     h1{font-size:40px}
-    .tab{font-size:10px;letter-spacing:.08em;padding:10px 4px}
+    .tab{font-size:10px;letter-spacing:.04em;padding:10px 3px}
     .tab .tab-count{display:none}
   }
 </style>
@@ -411,6 +427,7 @@
       <div class="tabs" role="tablist">
         <button class="tab active" role="tab" id="tab-cons" data-target="cons" aria-selected="true" aria-controls="panel-cons" tabindex="0">Consonantes <span class="tab-count" id="n-cons">0</span></button>
         <button class="tab" role="tab" id="tab-aso" data-target="aso" aria-selected="false" aria-controls="panel-aso" tabindex="-1">Asonantes <span class="tab-count" id="n-aso">0</span></button>
+        <button class="tab" role="tab" id="tab-fam" data-target="fam" aria-selected="false" aria-controls="panel-fam" tabindex="-1">Familia <span class="tab-count" id="n-fam">0</span></button>
         <button class="tab" role="tab" id="tab-apx" data-target="apx" aria-selected="false" aria-controls="panel-apx" tabindex="-1">Aproximadas <span class="tab-count" id="n-apx">0</span></button>
         <button class="tab" role="tab" id="tab-syn" data-target="syn" aria-selected="false" aria-controls="panel-syn" tabindex="-1">Sinónimos <span class="tab-count" id="n-syn">0</span></button>
       </div>
@@ -443,6 +460,9 @@
     <section class="section aso" data-panel="aso" role="tabpanel" id="panel-aso" aria-labelledby="tab-aso" tabindex="0" hidden>
       <div class="grid" id="asonantes-grid"></div>
     </section>
+    <section class="section fam" data-panel="fam" role="tabpanel" id="panel-fam" aria-labelledby="tab-fam" tabindex="0" hidden>
+      <div id="familia-grid"></div>
+    </section>
     <section class="section apx" data-panel="apx" role="tabpanel" id="panel-apx" aria-labelledby="tab-apx" tabindex="0" hidden>
       <div class="grid" id="aproximadas-grid"></div>
     </section>
@@ -453,7 +473,7 @@
 
   <footer>
     <span class="fl">
-      <span class="copyline"><span class="cw">Copyright </span>© 2026 Rimarium V4.7</span>
+      <span class="copyline"><span class="cw">Copyright </span>© 2026 Rimarium V4.8</span>
       <button class="cred-link" id="cred-link" type="button" aria-controls="cred-panel" aria-expanded="false">Fuentes y Créditos</button>
     </span>
     <span class="fr">
@@ -465,6 +485,7 @@
     <p>Rimarium se construye sobre datos abiertos. Nuestro agradecimiento a sus autores:</p>
     <p><b>Rimas y diccionario:</b> «Lemario general del español» de Ismael Olea (<a href="https://github.com/olea/lemarios">olea/lemarios</a>); lista de frecuencia de <a href="https://github.com/hermitdave/FrequencyWords">hermitdave/FrequencyWords</a> (datos de OpenSubtitles); y <a href="https://github.com/words/an-array-of-spanish-words">words/an-array-of-spanish-words</a>.</p>
     <p><b>Sinónimos:</b> tesauro español de OpenOffice/LibreOffice en formato MyThes (proyecto OpenThesaurus / RLA-ES), distribuido bajo licencia LGPL. Lematización de formas verbales y plurales a partir de <a href="https://github.com/doozan/spanish_data">doozan/spanish_data</a> (derivado de Wiktionary, CC BY-SA).</p>
+    <p><b>Rimas de familia:</b> la pestaña «Familia» adapta al español el espectro de rimas de <b>Pat Pattison</b> (<i>Writing Better Lyrics</i>, Berklee) —de familia, aditiva y sustractiva— agrupando las consonantes por modo de articulación (nasal, oclusiva, fricativa). Las líquidas (l · r) se añaden como extensión al español, ajena al modelo original. La clasificación opera sobre la capa fonémica de Rimarium (seseo, yeísmo, b=v). Es una adaptación propia, no una taxonomía de la tradición métrica española.</p>
     <p>Cada recurso pertenece a sus respectivos autores y se usa conforme a sus licencias. Rimarium no está afiliado a estos proyectos.</p>
   </div>
 
@@ -59151,9 +59172,11 @@ const conGrid = document.getElementById('consonantes-grid');
 const asoGrid = document.getElementById('asonantes-grid');
 const apxGrid = document.getElementById('aproximadas-grid');
 const synGrid = document.getElementById('sinonimos-grid');
+const famGrid = document.getElementById('familia-grid');
 const nCons   = document.getElementById('n-cons');
 const nAso    = document.getElementById('n-aso');
 const nApx    = document.getElementById('n-apx');
+const nFam    = document.getElementById('n-fam');
 const nSyn    = document.getElementById('n-syn');
 
 // Mapa de sinónimos (tesauro español MyThes), cargado desde el bloque embebido
@@ -59161,7 +59184,7 @@ const SINONIMOS = new Map();
 // Mapa forma flexionada → lema (para lematizar la búsqueda de sinónimos)
 const LEMAS = new Map();
 
-const MAX_CONS = 90, MAX_ASO = 90, MAX_APX = 60;
+const MAX_CONS = 90, MAX_ASO = 90, MAX_APX = 60, MAX_FAM_GRUPO = 40;
 
 // ─── Fonética / acentos ────────────────────────────────────────────────────
 const ACENTOS = {'á':'a','é':'e','í':'i','ó':'o','ú':'u','ü':'u'};
@@ -59255,6 +59278,102 @@ function claveCons(w){
   x = x.replace(/ll/g,'y');                // ll = y (yeísmo)
   x = x.replace(/x/g,'ks');
   return x;
+}
+
+// ─── Rima de familia (modelo de Pat Pattison adaptado al español) ───────────
+// Sobre la clave fonémica ya normalizada (claveCons: b=v, s=z=c·, k=c/qu, j=g·,
+// y=ll). Dos consonantes "riman por familia" si comparten modo de articulación.
+// Sonoridad ABIERTA (cabo/gato riman). Líquidas = 4ª familia, extensión al
+// español (Pattison no las tipifica; en español son productivísimas).
+const FAMILIA = (() => {
+  const m = new Map();
+  const grupos = {
+    nasal:     ['m','n','ñ'],
+    oclusiva:  ['p','b','t','d','k','g'],
+    fricativa: ['f','s','j','c'],           // 'c' aquí = dígrafo ch (ver claveFam)
+    liquida:   ['l','r','ŕ'],               // ŕ = rr; r≠rr se pierde a propósito
+  };
+  for(const [fam, cs] of Object.entries(grupos)) for(const c of cs) m.set(c, fam);
+  return m;
+})();
+
+// Clave fonémica para familias: como claveCons pero marca ch como 'ĉ' (una sola
+// consonante fricativa) para no confundirla con c+h ni con k.
+function claveFam(w){
+  let x = stripAcc(w.slice(tonicIndex(w)).toLowerCase());
+  x = x.replace(/ch/g,'ĉ');                 // dígrafo ch = un fonema fricativo
+  x = x.replace(/rr/g,'ŕ');
+  x = x.replace(/h/g,'');
+  x = x.replace(/qu/g,'k');
+  x = x.replace(/gue/g,'ge').replace(/gui/g,'gi');
+  x = x.replace(/ge/g,'je').replace(/gi/g,'ji');
+  x = x.replace(/ce/g,'se').replace(/ci/g,'si');
+  x = x.replace(/z/g,'s');
+  x = x.replace(/c/g,'k');
+  x = x.replace(/v/g,'b');
+  x = x.replace(/ll/g,'y');
+  x = x.replace(/ĉ/g,'c');                   // devuelve ch como 'c' (marca de familia fricativa)
+  x = x.replace(/x/g,'ks');
+  return x;
+}
+// Descompone la clave en núcleos vocálicos y consonantes intermedias.
+function segmentar(clave){
+  const V = 'aeiou';
+  const vocales = [], cons = [];
+  let buf = '';
+  for(const ch of clave){
+    if(V.includes(ch)){ vocales.push(ch); cons.push(buf); buf=''; }
+    else buf += ch;
+  }
+  cons.push(buf);                            // consonantes finales (coda)
+  return { vocales, cons };
+}
+// Compara dos clusters consonánticos en una misma posición.
+//  · Si tienen IGUAL longitud: compara fonema a fonema. Cada par distinto es
+//    familia (mismo modo articulatorio) o asonante (sin parentesco). Así una
+//    rima de familia mantiene la estructura consonántica paralela (cama/lana),
+//    no admite codas de más (cama/banda queda fuera).
+//  · Si difieren en longitud: es adición/sustracción de sonido. Solo se admite
+//    como aditiva/sustractiva pura si el cluster corto está CONTENIDO en el
+//    largo (mano/mando: n ⊂ nd). Si además hay sustitución, es asonante.
+function clasificarCluster(a, b, acc){
+  if(a.length === b.length){
+    for(let k=0;k<a.length;k++){
+      const ca=a[k], cb=b[k];
+      if(ca===cb) continue;
+      const fa=FAMILIA.get(ca)||null, fb=FAMILIA.get(cb)||null;
+      if(fa && fa===fb){ acc.fam=true; acc.familias.push(fa); }
+      else { acc.ason=true; }
+    }
+    return;
+  }
+  // longitudes distintas: exige que el corto sea subsecuencia del largo
+  const corto = a.length<b.length ? a : b;
+  const largo = a.length<b.length ? b : a;
+  let i=0;
+  for(let k=0;k<largo.length && i<corto.length;k++) if(largo[k]===corto[i]) i++;
+  if(i === corto.length){                 // corto ⊂ largo: adición/sustracción limpia
+    if(b.length>a.length) acc.add=true; else acc.sub=true;
+  } else {
+    acc.ason=true;                         // hay sustitución encubierta → asonante
+  }
+}
+// Clasifica la relación entre la palabra buscada (q) y una candidata (w),
+// ambas ya en claveFam. Devuelve {tipo, familias} o null si no hay parentesco.
+//   tipo: 'familia' | 'aditiva' | 'sustractiva'
+function relacionFamilia(claveQ, claveW){
+  if(claveQ === claveW) return null;         // idéntica = rima perfecta, no aquí
+  const A = segmentar(claveQ), B = segmentar(claveW);
+  if(A.vocales.join('') !== B.vocales.join('')) return null;  // vocales deben coincidir
+  const n = A.vocales.length + 1;
+  const acc = { fam:false, add:false, sub:false, ason:false, familias:[] };
+  for(let i=0;i<n;i++) clasificarCluster(A.cons[i]||'', B.cons[i]||'', acc);
+  if(acc.ason) return null;                    // algún par sin parentesco → no es familia
+  if(acc.fam)  return { tipo:'familia', familias:[...new Set(acc.familias)] };
+  if(acc.add && !acc.sub) return { tipo:'aditiva', familias:[] };
+  if(acc.sub && !acc.add) return { tipo:'sustractiva', familias:[] };
+  if(acc.add && acc.sub)  return { tipo:'familia', familias:[] };
+  return null;
 }
 
 // Codificación fonética española del sufijo
@@ -59391,6 +59510,30 @@ function buscar(palabra, preservarTab){
   scored.sort((a,b) => (b[1]-a[1]) || ordenFrec(a[0], b[0]));
   for(let i=0;i<Math.min(scored.length, MAX_APX);i++) aproximadas.push(scored[i]);
 
+  // 3ª pasada: rimas de familia (modelo de Pattison adaptado al español).
+  // Agrupa por categoría: nasal, oclusiva, fricativa, líquida, aditiva, sustractiva.
+  const qFam = claveFam(q);
+  const grupoFam = { nasal:[], oclusiva:[], fricativa:[], liquida:[], aditiva:[], sustractiva:[] };
+  let totalFam = 0;
+  for(const w of diccionario){
+    if(w === q || yaConsonante.has(w)) continue;   // idénticas ya son consonantes
+    if(!pasaSilabas(w)) continue;
+    const rel = relacionFamilia(qFam, claveFam(w));
+    if(!rel) continue;
+    if(rel.tipo === 'familia'){
+      // clasifica en la primera familia detectada (nasal>oclusiva>fricativa>líquida)
+      const orden = ['nasal','oclusiva','fricativa','liquida'];
+      const fam = orden.find(f => rel.familias.includes(f)) || rel.familias[0];
+      if(fam && grupoFam[fam]){ grupoFam[fam].push(w); totalFam++; }
+    } else if(rel.tipo === 'aditiva'){ grupoFam.aditiva.push(w); totalFam++; }
+    else if(rel.tipo === 'sustractiva'){ grupoFam.sustractiva.push(w); totalFam++; }
+  }
+  // ordena cada grupo por frecuencia y recorta
+  for(const k of Object.keys(grupoFam)){
+    grupoFam[k].sort(ordenFrec);
+    grupoFam[k] = grupoFam[k].slice(0, MAX_FAM_GRUPO);
+  }
+
   // ── Render ──
   // sinónimos: de la palabra exacta o, si no tiene, de su lema (quiero→querer)
   const sinonimos = SINONIMOS.get(q)
@@ -59398,23 +59541,57 @@ function buscar(palabra, preservarTab){
                  || [];
   titleEl.innerHTML = `Rimas para <em>${escapeHtml(q)}</em>`;
   patEl.textContent = `Consonante -${qCons}  ·  Asonante ${qAso.split('').join('-')}`;
+  const totalFamShown = Object.values(grupoFam).reduce((s,a)=>s+a.length,0);
   nCons.textContent = totalCons > MAX_CONS ? MAX_CONS+' de '+totalCons : totalCons;
   nAso.textContent  = totalAso  > MAX_ASO  ? MAX_ASO +' de '+totalAso  : totalAso;
   nApx.textContent  = aproximadas.length;
+  nFam.textContent  = totalFam > totalFamShown ? totalFamShown+' de '+totalFam : totalFam;
   nSyn.textContent  = sinonimos.length;
 
   renderCards(conGrid, consonantes);
   renderCards(asoGrid, asonantes);
   renderCards(apxGrid, aproximadas);
+  renderFamilia(famGrid, grupoFam);
   renderCards(synGrid, sinonimos);
 
   // Abre la primera pestaña con resultados (útil en esdrújulas, casi sin consonantes)
   if(!preservarTab){
     const primera = consonantes.length ? 'cons' : asonantes.length ? 'aso'
-                  : aproximadas.length ? 'apx' : sinonimos.length ? 'syn' : 'cons';
+                  : totalFamShown ? 'fam' : aproximadas.length ? 'apx'
+                  : sinonimos.length ? 'syn' : 'cons';
     activarTab(primera);
   }
   area.style.display = 'block';
+}
+
+// Render de la pestaña Familia: grupos etiquetados (nasal, oclusiva, fricativa,
+// líquida, aditiva, sustractiva), cada uno con su encabezado y explicación.
+function renderFamilia(grid, grupos){
+  grid.innerHTML = '';
+  const META = {
+    nasal:      ['Nasales',      'consonantes de la misma familia nasal (m · n · ñ)'],
+    oclusiva:   ['Oclusivas',    'consonantes que estallan (p · b · t · d · k · g)'],
+    fricativa:  ['Fricativas',   'consonantes de roce continuo (f · s · j · ch)'],
+    liquida:    ['Líquidas',     'l · r (extensión al español, no del canon original)'],
+    aditiva:    ['Aditivas',     'la rima añade un sonido (mano → mando)'],
+    sustractiva:['Sustractivas', 'la rima quita un sonido (mando → mano)'],
+  };
+  let algo = false;
+  for(const k of ['nasal','oclusiva','fricativa','liquida','aditiva','sustractiva']){
+    const lista = grupos[k];
+    if(!lista || !lista.length) continue;
+    algo = true;
+    const head = document.createElement('div');
+    head.className = 'fam-group-head';
+    head.innerHTML = '<span class="fam-group-name">'+META[k][0]+'</span>'
+                   + '<span class="fam-group-desc">'+META[k][1]+'</span>';
+    grid.appendChild(head);
+    const sub = document.createElement('div');
+    sub.className = 'grid fam-subgrid';
+    renderCards(sub, lista);
+    grid.appendChild(sub);
+  }
+  if(!algo) grid.innerHTML = '<span class="no-results">Sin resultados</span>';
 }
 
 // Renderiza una cuadrícula de tarjetas. `pares` puede ser [palabra] o [palabra, similitud].
